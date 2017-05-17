@@ -11,6 +11,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         
         //测试同步问题
+        //测试同步2
     }
 
     public static void main(String[] args){
