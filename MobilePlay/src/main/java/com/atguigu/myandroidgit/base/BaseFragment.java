@@ -13,7 +13,7 @@ import android.view.ViewGroup;
  */
 
 public abstract class BaseFragment extends Fragment {
-    private Context mContext;
+    public Context mContext;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,7 +55,5 @@ public abstract class BaseFragment extends Fragment {
     /*联网请求
     绑定数据时重写该方法*/
     public void initData(){
-
     }
-
 }
