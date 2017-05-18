@@ -1,1 +1,1 @@
-include ':app', ':appTest'
+include ':app', ':MobilePlay'
