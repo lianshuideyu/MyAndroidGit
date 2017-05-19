@@ -21,39 +21,36 @@
 
     <!--RadioGroup,嵌套RadioButton-->
     <RadioGroup
-        android:background="#F2F2F2"
         android:id="@+id/rg_bottom_button"
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:background="#F2F2F2"
         android:orientation="horizontal"
         android:padding="10dp">
 
         <RadioButton
             android:id="@+id/rb_video"
             style="@style/rg_bottom_buton"
-            android:text="本地视频"
             android:drawableTop="@drawable/video_selector"
-             />
+            android:text="本地视频" />
 
         <RadioButton
             android:id="@+id/rb_audio"
             style="@style/rg_bottom_buton"
-            android:text="本地音乐"
             android:drawableTop="@drawable/audio_selector"
-            />
+            android:text="本地音乐" />
 
         <RadioButton
             android:id="@+id/rb_netaudio"
             style="@style/rg_bottom_buton"
-            android:text="网络音乐"
             android:drawableTop="@drawable/netaudio_selector"
-            />
+            android:text="网络音乐" />
+
         <RadioButton
             android:id="@+id/rb_netvideo"
             style="@style/rg_bottom_buton"
-            android:text="网络视频"
             android:drawableTop="@drawable/netvideo_selector"
-            />
+            android:text="网络视频" />
 
     </RadioGroup>
 
