@@ -1,11 +1,10 @@
 package com.atguigu.myandroidgit.fragment;
 
-import android.graphics.Color;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.ListView;
 
+import com.atguigu.myandroidgit.R;
 import com.atguigu.myandroidgit.base.BaseFragment;
 
 /**
@@ -13,24 +12,20 @@ import com.atguigu.myandroidgit.base.BaseFragment;
  */
 
 public class LocalVideoFragment extends BaseFragment {
-    //临时测试用
-    private TextView textView;
+    private ListView lv;
 
     @Override
     public View initView() {
         Log.e("TAG","本地视频Ui初始化...");
-        textView = new TextView(mContext);
-        textView.setTextColor(Color.RED);
-        textView.setGravity(Gravity.CENTER);
-        textView.setTextSize(25);
+       View.inflate(mContext, R.layout.activity_main,null);
 
-        return textView;
+        return null;
     }
 
     @Override
     public void initData() {
         super.initData();
         Log.e("TAG","本地视频数据初始化了...");
-        textView.setText("本地视频");
+
     }
 }
