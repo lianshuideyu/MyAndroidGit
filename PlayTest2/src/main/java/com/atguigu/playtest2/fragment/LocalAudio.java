@@ -2,7 +2,6 @@ package com.atguigu.playtest2.fragment;
 
 import android.graphics.Color;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.atguigu.playtest2.baseFragment.BaseFragment;
@@ -13,7 +12,6 @@ import com.atguigu.playtest2.baseFragment.BaseFragment;
 
 public class LocalAudio extends BaseFragment{
     private TextView tv;
-    private ListView list;
 
     @Override
     public View initView() {
