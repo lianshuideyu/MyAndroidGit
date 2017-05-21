@@ -253,10 +253,38 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         }
     };
 
+    private float touchRange;//可移动的最大距离
+    private float downY;
+    private int currVol;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         //将触摸事件交给手势识别器
         detector.onTouchEvent(event);
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN :
+                downY = event.getY();
+                touchRange = Math.min(screenHeight,screenWidth);
+                currVol = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+
+                handler.removeMessages(HIDE_MEDIACONTROLLER);
+                break;
+            case MotionEvent.ACTION_MOVE :
+                float newY = event.getY();
+                float distanceY = downY - newY;
+                float newVoice = distanceY / touchRange * maxVoice;
+                float lastVoice = Math.min(Math.max(newVoice + newVoice,0),maxVoice);
+
+                if(newVoice != 0) {
+                    updateVoiceProgress((int) lastVoice);
+                }
+
+                break;
+            case MotionEvent.ACTION_UP :
+                handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+                break;
+        }
+
 
         return super.onTouchEvent(event);
     }
