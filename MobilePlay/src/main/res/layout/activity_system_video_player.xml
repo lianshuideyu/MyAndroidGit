@@ -8,7 +8,7 @@
     android:background="#000000"
     tools:context="com.atguigu.myandroidgit.activity.SystemVideoPlayerActivity">
 
-    <VideoView
+    <com.atguigu.myandroidgit.View.VideoView
         android:id="@+id/vv"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
