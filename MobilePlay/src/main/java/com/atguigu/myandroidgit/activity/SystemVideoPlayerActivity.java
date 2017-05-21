@@ -1,5 +1,9 @@
 package com.atguigu.myandroidgit.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +21,9 @@ import android.widget.VideoView;
 
 import com.atguigu.myandroidgit.R;
 import com.atguigu.myandroidgit.utils.Utils;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class SystemVideoPlayerActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -41,6 +48,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private Button btnNext;
     private Button btnSwitchScreen;
     private Utils utils;
+
+    private MyBroadCastReceiver receiver;
 
     private void findViews() {
 
@@ -78,7 +87,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        utils = new Utils();
+        initData();
+
 
         findViews();
 
@@ -90,13 +100,25 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         vv.setVideoURI(uri);
     }
 
-    private Handler handler = new Handler(){
+    private void initData() {
+        utils = new Utils();
+
+        //注册监听电量变化广播
+        receiver = new MyBroadCastReceiver();
+        //过滤器，过滤出来感兴趣的
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        //注册广播
+        registerReceiver(receiver, intentFilter);
+    }
+
+    private Handler handler = new Handler() {
 
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
-                case  PROGRESS:
+                case PROGRESS:
                     //得到当前进度
                     int currentPosition = vv.getCurrentPosition();
                     //使seekBar进度更新
@@ -105,7 +127,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                     tvCurrentTime.setText(utils.stringForTime(currentPosition));
 
                     //循环发消息
-                    sendEmptyMessageDelayed(PROGRESS,1000);
+                    sendEmptyMessageDelayed(PROGRESS, 1000);
                     break;
             }
 
@@ -122,6 +144,9 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                 seekbarVideo.setMax(duration);
                 //设置文本总时间
                 tvDuration.setText(utils.stringForTime(duration));
+
+                //得到系统时间
+                tvSystemTime.setText(getSystemTime());
 
                 vv.start();
 
@@ -151,7 +176,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         seekbarVideo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(fromUser) {
+                if (fromUser) {
                     vv.seekTo(progress);
                 }
             }
@@ -166,6 +191,12 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
             }
         });
+    }
+
+    private String getSystemTime() {
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+        return format.format(new Date());
+
     }
 
     /**
@@ -185,13 +216,13 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         } else if (v == btnPre) {
 
         } else if (v == btnStartPause) {
-            if(vv.isPlaying()) {
+            if (vv.isPlaying()) {
                 //暂停
                 vv.pause();
                 //按钮状态--播放
                 btnStartPause.setBackgroundResource(R.drawable.btn_start_selector);
 
-            }else {
+            } else {
                 //播放
                 vv.start();
                 btnStartPause.setBackgroundResource(R.drawable.btn_pause_selector);
@@ -205,12 +236,51 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
     }
 
+
+
+    //广播接收，监听手机电量
+    class MyBroadCastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int level = intent.getIntExtra("level", 0);//主线程
+
+            setBatteryView(level);
+        }
+    }
+
+    private void setBatteryView(int level) {
+        if (level <= 0) {
+            ivBattery.setImageResource(R.drawable.ic_battery_0);
+        } else if (level <= 10) {
+            ivBattery.setImageResource(R.drawable.ic_battery_10);
+        } else if (level <= 20) {
+            ivBattery.setImageResource(R.drawable.ic_battery_20);
+        } else if (level <= 40) {
+            ivBattery.setImageResource(R.drawable.ic_battery_40);
+        } else if (level <= 60) {
+            ivBattery.setImageResource(R.drawable.ic_battery_60);
+        } else if (level <= 80) {
+            ivBattery.setImageResource(R.drawable.ic_battery_80);
+        } else if (level <= 100) {
+            ivBattery.setImageResource(R.drawable.ic_battery_100);
+        } else {
+            ivBattery.setImageResource(R.drawable.ic_battery_100);
+        }
+    }
+
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-
-        if(handler != null) {
+        if (handler != null) {
             handler.removeCallbacksAndMessages(null);
+            handler = null;
         }
+
+        //取消广播的注册
+        if(receiver != null) {
+            unregisterReceiver(receiver);
+            receiver = null;
+        }
+        super.onDestroy();
     }
 }
