@@ -20,9 +20,11 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.atguigu.myandroidgit.R;
+import com.atguigu.myandroidgit.domain.MediaItem;
 import com.atguigu.myandroidgit.utils.Utils;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class SystemVideoPlayerActivity extends AppCompatActivity implements View.OnClickListener {
@@ -50,6 +52,10 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private Utils utils;
 
     private MyBroadCastReceiver receiver;
+    //将播放文件放入集合，使其序列化
+    private ArrayList<MediaItem> mediaItems;
+    //视频列表的位置
+    private int position;
 
     private void findViews() {
 
@@ -91,13 +97,32 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
 
         findViews();
+        getData();
 
-        uri = getIntent().getData();
 
         //设置三个监听
         setListener();
+        setData();
 
-        vv.setVideoURI(uri);
+    }
+
+    private void setData() {
+        if(mediaItems != null && mediaItems.size() > 0) {
+            MediaItem mediaItem = mediaItems.get(position);
+            tvName.setText(mediaItem.getName());
+            vv.setVideoPath(mediaItem.getData());
+
+        }else if(uri != null) {
+            //设置播放地址
+            vv.setVideoURI(uri);
+        }
+    }
+
+    private void getData() {
+        //得到播放地址
+        uri = getIntent().getData();
+        mediaItems = (ArrayList<MediaItem>) getIntent().getSerializableExtra("videolist");
+        position = getIntent().getIntExtra("position", 0);
     }
 
     private void initData() {

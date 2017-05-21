@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -18,7 +19,7 @@ import com.atguigu.myandroidgit.R;
 import com.atguigu.myandroidgit.activity.SystemVideoPlayerActivity;
 import com.atguigu.myandroidgit.adapter.LocalVideoAdapter;
 import com.atguigu.myandroidgit.base.BaseFragment;
-import com.atguigu.myandroidgit.domain.LocalVideoBean;
+import com.atguigu.myandroidgit.domain.MediaItem;
 
 import java.util.ArrayList;
 
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 public class LocalVideoFragment extends BaseFragment {
     private ListView lv;
     private TextView tv_nocontent;
-    private ArrayList<LocalVideoBean> videos;
+    private ArrayList<MediaItem> mediaItems;
     private LocalVideoAdapter adapter;
     private Object data;
 
@@ -47,10 +48,22 @@ public class LocalVideoFragment extends BaseFragment {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                LocalVideoBean item = adapter.getItem(position);
+                MediaItem item = adapter.getItem(position);
+//                Intent intent = new Intent(mContext, SystemVideoPlayerActivity.class);
+//                intent.setDataAndType(Uri.parse(item.getData()),"video/*");
+//                startActivity(intent);
+
+                //传递视频列表过去
+
                 Intent intent = new Intent(mContext, SystemVideoPlayerActivity.class);
-                intent.setDataAndType(Uri.parse(item.getData()),"video/*");
+
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("videolist",mediaItems);
+                intent.putExtra("position",position);
+
+                intent.putExtras(bundle);
                 startActivity(intent);
+
             }
         });
         return view;
@@ -71,10 +84,10 @@ public class LocalVideoFragment extends BaseFragment {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if(videos != null && videos.size() > 0) {
+            if(mediaItems != null && mediaItems.size() > 0) {
                 //有数据
                 tv_nocontent.setVisibility(View.GONE);
-                adapter = new LocalVideoAdapter(mContext,videos);
+                adapter = new LocalVideoAdapter(mContext,mediaItems);
 
                 lv.setAdapter(adapter);
             }else {
@@ -89,7 +102,7 @@ public class LocalVideoFragment extends BaseFragment {
         //添加数据为耗时的操作
         new Thread(){
             public void run(){
-                videos = new ArrayList<LocalVideoBean>();
+                mediaItems = new ArrayList<MediaItem>();
                 //得到解析者
                 Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
                 ContentResolver resolver = mContext.getContentResolver();
@@ -107,7 +120,7 @@ public class LocalVideoFragment extends BaseFragment {
                     long duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DURATION));
                     long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.SIZE));
 
-                    videos.add(new LocalVideoBean(name,duration,size,data));
+                    mediaItems.add(new MediaItem(name,duration,size,data));
 
                 }
 

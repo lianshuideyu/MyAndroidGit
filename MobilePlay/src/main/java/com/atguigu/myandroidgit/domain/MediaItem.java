@@ -1,17 +1,19 @@
 package com.atguigu.myandroidgit.domain;
 
+import java.io.Serializable;
+
 /**
  * Created by Administrator on 2017/5/19.
  */
 
-public class LocalVideoBean {
+public class MediaItem implements Serializable{
 
     private String name;
     private long duration;
     private long size;
     private String data;
 
-    public LocalVideoBean(String name, long duration, long size ,String data) {
+    public MediaItem(String name, long duration, long size , String data) {
         this.data = data;
         this.name = name;
         this.duration = duration;
@@ -20,7 +22,7 @@ public class LocalVideoBean {
 
     @Override
     public String toString() {
-        return "LocalVideoBean{" +
+        return "MediaItem{" +
                 "name='" + name + '\'' +
                 ", duration=" + duration +
                 ", size=" + size +

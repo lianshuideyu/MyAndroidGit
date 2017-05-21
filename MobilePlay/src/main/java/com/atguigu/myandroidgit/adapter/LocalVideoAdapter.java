@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.atguigu.myandroidgit.R;
-import com.atguigu.myandroidgit.domain.LocalVideoBean;
+import com.atguigu.myandroidgit.domain.MediaItem;
 import com.atguigu.myandroidgit.utils.Utils;
 
 import java.util.ArrayList;
@@ -19,10 +19,10 @@ import java.util.ArrayList;
 
 public class LocalVideoAdapter extends BaseAdapter{
     private final Context context;
-    private final ArrayList<LocalVideoBean> videos;
+    private final ArrayList<MediaItem> videos;
     private Utils utils;
 
-    public LocalVideoAdapter(Context context, ArrayList<LocalVideoBean> videos) {
+    public LocalVideoAdapter(Context context, ArrayList<MediaItem> videos) {
         this.context = context;
         this.videos = videos;
         this.utils = new Utils();
@@ -34,7 +34,7 @@ public class LocalVideoAdapter extends BaseAdapter{
     }
 
     @Override
-    public LocalVideoBean getItem(int position) {
+    public MediaItem getItem(int position) {
         return videos.get(position);
     }
 
@@ -58,7 +58,7 @@ public class LocalVideoAdapter extends BaseAdapter{
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        LocalVideoBean bean = videos.get(position);
+        MediaItem bean = videos.get(position);
 
         viewHolder.tv_name.setText(bean.getName());
         viewHolder.tv_duration.setText(utils.stringForTime((int) bean.getDuration()));
