@@ -193,7 +193,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             @Override
             public void onCompletion(MediaPlayer mp) {
                 Toast.makeText(SystemVideoPlayerActivity.this, "播放完成", Toast.LENGTH_SHORT).show();
-                finish();
+                //finish();
+                setNextVideo();//播完了播放下一个
             }
         });
 
@@ -237,8 +238,11 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         } else if (v == btnSwitchPlayer) {
 
         } else if (v == btnExit) {
+            finish();
 
         } else if (v == btnPre) {
+            //上一个视频
+            setPreVideo();
 
         } else if (v == btnStartPause) {
             if (vv.isPlaying()) {
@@ -254,13 +258,91 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             }
 
         } else if (v == btnNext) {
+            //下一个视频
+            setNextVideo();
 
         } else if (v == btnSwitchScreen) {
+            //设置全屏还是默认
 
+        }
+        //设置按键是否可点击的状态
+        setButtonStatus();
+    }
+
+    /**
+     *  设置按键是否可点击的状态,万能
+     */
+    private void setButtonStatus() {
+        if(mediaItems != null && mediaItems.size() > 0) {
+            //有视频可放
+            setEnable(true);
+            if(position == 0) {
+                //上一个不可点并为灰色
+                btnPre.setBackgroundResource(R.drawable.btn_pre_gray);
+                btnPre.setEnabled(false);
+            }
+
+            if(position == mediaItems.size() - 1) {
+                btnNext.setBackgroundResource(R.drawable.btn_next_gray);
+                btnNext.setEnabled(false);
+            }
+
+        }else if(uri != null) {
+            //上一个和下一个都不可用点击
+            setEnable(false);
         }
 
     }
 
+    /**
+     * 设置按钮是否可以点击
+     * @param b
+     */
+    private void setEnable(boolean b) {
+        if(b) {
+            //上一个和下一个都可以点击，设置按键的背景
+            btnPre.setBackgroundResource(R.drawable.btn_pre_selector);
+            btnNext.setBackgroundResource(R.drawable.btn_next_selector);
+
+        }else {
+            //上一个和下一个都为灰色并且不可点击，设置按键的背景
+            btnPre.setBackgroundResource(R.drawable.btn_pre_gray);
+            btnNext.setBackgroundResource(R.drawable.btn_next_gray);
+        }
+        btnPre.setEnabled(b);
+        btnNext.setEnabled(b);
+
+    }
+
+    private void setPreVideo() {
+        position--;
+        if(position >= 0) {
+            //还是在列表范围内容
+            MediaItem mediaItem = mediaItems.get(position);
+            vv.setVideoPath(mediaItem.getData());
+            tvName.setText(mediaItem.getName());
+
+            //设置按键状态
+            setButtonStatus();
+
+        }
+    }
+
+    private void setNextVideo() {
+        position++;
+        if(position < mediaItems.size()) {
+            MediaItem mediaItem = mediaItems.get(position);
+            vv.setVideoPath(mediaItem.getData());
+            tvName.setText(mediaItem.getName());
+
+            //设置按键状态
+            setButtonStatus();
+        }else {
+            Toast.makeText(SystemVideoPlayerActivity.this, "退出播放器", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
+    }
 
 
     //广播接收，监听手机电量
