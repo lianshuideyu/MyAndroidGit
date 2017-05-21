@@ -21,7 +21,9 @@
             android:name=".MobilePlayMainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask" />
-        <activity android:name=".activity.SystemVideoPlayerActivity"></activity>
+        <activity android:name=".activity.SystemVideoPlayerActivity"
+            android:screenOrientation="landscape"></activity>
+
     </application>
 
 </manifest>
