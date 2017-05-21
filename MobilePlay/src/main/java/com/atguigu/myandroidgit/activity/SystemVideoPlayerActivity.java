@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -82,6 +83,13 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private int videoWidth;
     private int videoHeight;
 
+    //音量： 0-15之间
+    private int currentVoice;
+    private AudioManager am;
+    //最大音量
+    private int maxVoice;
+    private boolean isMute = false;
+
     private void findViews() {
 
         setContentView(R.layout.activity_system_video_player);
@@ -112,11 +120,11 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         btnNext.setOnClickListener(this);
         btnSwitchScreen.setOnClickListener(this);
 
-        //得到屏幕的宽和高
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        screenHeight = metrics.heightPixels;
-        screenWidth = metrics.widthPixels;
+
+        //关联最大音量
+        seekbarVideo.setMax(maxVoice);
+        //设置当前进度
+        seekbarVideo.setProgress(currentVoice);
     }
 
     @Override
@@ -197,12 +205,20 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                     handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
                 }
 
-
                 return super.onSingleTapConfirmed(e);
             }
-
-
         });
+
+        //得到屏幕的宽和高
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        screenHeight = metrics.heightPixels;
+        screenWidth = metrics.widthPixels;
+
+        //初始化声音相关
+        am = (AudioManager) getSystemService(AUDIO_SERVICE);
+        currentVoice = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        maxVoice = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
     }
 
     private Handler handler = new Handler() {
@@ -324,6 +340,44 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                 handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
             }
         });
+
+        //监听声音的拖动
+        seekbarVideo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(fromUser) {
+                    updateVoiceProgress(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+    }
+
+    /**
+     * 滑动改变声音
+     * @param progress
+     */
+    private void updateVoiceProgress(int progress) {
+        currentVoice = progress;
+        am.setStreamVolume(AudioManager.STREAM_MUSIC,currentVoice,0);
+
+        seekbarVoice.setProgress(currentVoice);
+
+        if(currentVoice <= 0) {
+            isMute = true;
+        }else {
+            isMute = false;
+        }
     }
 
     private String getSystemTime() {
@@ -341,6 +395,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     public void onClick(View v) {
 
         if (v == btnVoice) {
+            isMute = !isMute;
+            updateVoice(isMute);
 
         } else if (v == btnSwitchPlayer) {
 
@@ -374,6 +430,19 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
         handler.removeMessages(HIDE_MEDIACONTROLLER);
         handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
+    }
+
+    private void updateVoice(boolean isMute) {
+        if(isMute) {
+            //静音
+            am.setStreamVolume(AudioManager.STREAM_MUSIC,0,0);
+            seekbarVoice.setProgress(0);
+        }else {
+            //非静音
+            am.setStreamVolume(AudioManager.STREAM_MUSIC,currentVoice,0);
+            seekbarVoice.setProgress(currentVoice);
+        }
+
     }
 
     /**
