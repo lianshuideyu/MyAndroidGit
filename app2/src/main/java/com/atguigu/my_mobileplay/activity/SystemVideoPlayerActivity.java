@@ -101,6 +101,11 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private LinearLayout ll_buffering;
     private TextView tv_net_speed;
 
+    //显示网速
+    private static final int SHOW_NET_SPEED = 2;
+    private LinearLayout ll_loading;
+    private TextView tv_loading_net_speed;
+
     private void findViews() {
 
         setContentView(R.layout.activity_system_video_player);
@@ -125,6 +130,9 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         ll_buffering = (LinearLayout) findViewById(R.id.ll_buffering);
         tv_net_speed = (TextView) findViewById(R.id.tv_net_speed);
 
+        ll_loading = (LinearLayout)findViewById(R.id.ll_loading);
+        tv_loading_net_speed = (TextView)findViewById(R.id.tv_loading_net_speed);
+
         //----------
         //sb_test = (SeekBar) findViewById(R.id.sb_test);
         //------
@@ -141,6 +149,9 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         seekbarVoice.setMax(maxVoice);
         //设置当前进度
         seekbarVoice.setProgress(currentVoice);
+
+        //发消息开始显示网速
+        handler.sendEmptyMessage(SHOW_NET_SPEED);
     }
 
     @Override
@@ -195,6 +206,16 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
+                case SHOW_NET_SPEED:
+                    if(isNetUri) {
+                        String netSpeed = utils.getNetSpeed(SystemVideoPlayerActivity.this);
+                        tv_loading_net_speed.setText("正在加载中...."+netSpeed);
+                        tv_net_speed.setText("正在缓冲...."+netSpeed);
+                        sendEmptyMessageDelayed(SHOW_NET_SPEED,1000);
+                    }
+                    
+                    break;
+                
                 case PROGRESS:
                     //得到当前进度
                     int currentPosition = vv.getCurrentPosition();
@@ -480,6 +501,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
                 //发消息更新进度
                 handler.sendEmptyMessage(PROGRESS);
+                //隐藏加载效果画面
+                ll_loading.setVisibility(View.GONE);
 
                 //默认隐藏
                 //hideMediaController();
@@ -491,9 +514,10 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         vv.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-                Toast.makeText(SystemVideoPlayerActivity.this, "播放错误", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SystemVideoPlayerActivity.this, "播放错误，准备切换万能播放器", Toast.LENGTH_SHORT).show();
+                startVitamioPlayer();
 
-                return false;
+                return true;
             }
         });
         //设置播放完成的监听
@@ -562,6 +586,29 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
             }
         });
+    }
+
+    /**
+     * 打开万能播放器
+     */
+    private void startVitamioPlayer() {
+        if(vv != null) {
+            vv.stopPlayback();//关闭当前
+        }
+        Intent intent = new Intent(this, VitamioVideoPlayerActivity.class);
+        if(mediaItems != null && mediaItems.size() > 0) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("videolist",mediaItems);
+
+            intent.putExtra("position",position);
+
+            intent.putExtras(bundle);
+        }else if(uri != null) {
+            intent.setData(uri);
+        }
+        startActivity(intent);
+        finish();//关闭当前页面
+
     }
 
     private void updateVoiceProgress(int progress) {
@@ -676,6 +723,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
             //判断是否为网络资源
             isNetUri = utils.isNetUri(mediaItem.getData());
+            ll_loading.setVisibility(View.VISIBLE);
 
             vv.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
@@ -692,6 +740,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             MediaItem mediaItem = mediaItems.get(position);
             //判断是否为网络资源
             isNetUri = utils.isNetUri(mediaItem.getData());
+            ll_loading.setVisibility(View.VISIBLE);
 
             vv.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
