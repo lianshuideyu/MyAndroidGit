@@ -1,11 +1,12 @@
 package com.atguigu.my_mobileplay.activity;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
 
 public class VitamioVideoPlayerActivity extends AppCompatActivity implements View.OnClickListener {
@@ -173,6 +175,8 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
 
 
         } else if (v == btnSwitchPlayer) {
+            switchPlayer();
+
             // Handle clicks for btnSwitchPlayer
         } else if (v == btnExit) {
             finish();
@@ -199,6 +203,39 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
 
         handler.removeMessages(HIDE_MEDIACONTROLLER);
         handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
+    }
+
+    private void switchPlayer() {
+        new AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("当前为万能播放器播放，当播放有声音没有画面，请切换到系统播放器播放")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startSystemPlayer();
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
+    }
+
+    private void startSystemPlayer() {
+        if(vv != null) {
+            vv.stopPlayback();//当前的播放器停止
+        }
+        Intent intent = new Intent(this, SystemVideoPlayerActivity.class);
+        if(mediaItems != null && mediaItems.size() > 0) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("videolist",mediaItems);
+            intent.putExtra("position",position);
+
+            intent.putExtras(bundle);
+        }else if(uri != null) {
+            intent.setData(uri);
+        }
+        startActivity(intent);
+        finish();//关闭当前页面
+
     }
 
     private void updateVoice(boolean isMute) {
@@ -587,9 +624,11 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
 
                 // Toast.makeText(SystemVideoPlayerActivity.this, "播放出错了哦", Toast.LENGTH_SHORT).show();
                 //一进来播放就会报错-视频格式不支持 --- 跳转到万能播放器
-                startVitamioPlayer();
+                //startVitamioPlayer();
                 //播放过程中网络中断导致播放异常--重新播放-三次重试
                 //文件中间部分损坏或者文件不完整-把下载做好
+                showErrorDialog();
+
                 return true;
             }
         });
@@ -671,6 +710,20 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
 //                }
 //            });
 //        }
+    }
+
+    private void showErrorDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("当前视频不可播放，请检查网络或者视频文件是否有损坏！")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .show();
+
     }
 
     private void startVitamioPlayer() {
