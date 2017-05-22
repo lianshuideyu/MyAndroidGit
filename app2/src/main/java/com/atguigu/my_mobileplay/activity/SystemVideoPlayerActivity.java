@@ -323,6 +323,9 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private float touchRange;//可移动的最大距离
     private float downY ;//手指按下时Y轴坐标
     private int currVol;//当前的音量
+    //用于区别左右屏
+    private float downX;
+
     //currentVoice当前音量
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -370,12 +373,16 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             updateVoiceProgress(currentVoice);
             handler.removeMessages(HIDE_MEDIACONTROLLER);
             handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+
+            return true;
         }else if(keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
             //音量加
             currentVoice++;
             updateVoiceProgress(currentVoice);
             handler.removeMessages(HIDE_MEDIACONTROLLER);
             handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+
+            return true;
         }
 
 
