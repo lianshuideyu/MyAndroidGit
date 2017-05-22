@@ -1,1 +1,1 @@
-include ':app', ':MobilePlay', ':PlayTest', ':PlayTest2'
+include ':app', ':MobilePlay', ':PlayTest', ':PlayTest2', ':vitamio-sample', ':vitamio', ':app2'

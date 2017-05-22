@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.atguigu.playtest.R;
-import com.atguigu.playtest.domain.LocalVideo;
+import com.atguigu.playtest.domain.MediaItem;
 import com.atguigu.playtest.utils.Utils;
 
 import java.util.ArrayList;
@@ -19,11 +19,11 @@ import java.util.ArrayList;
 
 public class LocalVideoAdapter extends BaseAdapter{
 
-    private final ArrayList<LocalVideo> list;
+    private final ArrayList<MediaItem> list;
     private final Context context;
     private Utils utils;
 
-    public LocalVideoAdapter(Context context, ArrayList<LocalVideo> list) {
+    public LocalVideoAdapter(Context context, ArrayList<MediaItem> list) {
         this.context = context;
         this.list = list;
         utils = new Utils();
@@ -35,7 +35,7 @@ public class LocalVideoAdapter extends BaseAdapter{
     }
 
     @Override
-    public LocalVideo getItem(int i) {
+    public MediaItem getItem(int i) {
         return list.get(i);
     }
 
@@ -61,7 +61,7 @@ public class LocalVideoAdapter extends BaseAdapter{
 
 
         //根据位置得到对应的数据
-        LocalVideo mediaItem = list.get(position);
+        MediaItem mediaItem = list.get(position);
         viewHolder.tv_name.setText(mediaItem.getName());
         viewHolder.tv_size.setText(Formatter.formatFileSize(context,mediaItem.getSize()));
         viewHolder.tv_duration.setText(utils.stringForTime((int) mediaItem.getDuration()));

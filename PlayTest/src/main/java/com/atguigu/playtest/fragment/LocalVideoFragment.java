@@ -17,7 +17,7 @@ import com.atguigu.playtest.R;
 import com.atguigu.playtest.activity.SystemVideoPlayerActivity;
 import com.atguigu.playtest.adapter.LocalVideoAdapter;
 import com.atguigu.playtest.baseFragment.BaseFragment;
-import com.atguigu.playtest.domain.LocalVideo;
+import com.atguigu.playtest.domain.MediaItem;
 
 import java.util.ArrayList;
 
@@ -29,7 +29,7 @@ public class LocalVideoFragment extends BaseFragment {
     private TextView tv_noContent;
     private ListView listView;
     private LocalVideoAdapter adapter;
-    private ArrayList<LocalVideo> list;
+    private ArrayList<MediaItem> list;
     private Uri uri;
 
     /**
@@ -46,7 +46,7 @@ public class LocalVideoFragment extends BaseFragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                LocalVideo item = adapter.getItem(i);
+                MediaItem item = adapter.getItem(i);
 
                 Intent intent = new Intent(context, SystemVideoPlayerActivity.class);
                 intent.setDataAndType(Uri.parse(item.getData()),"video/*");
@@ -91,7 +91,7 @@ public class LocalVideoFragment extends BaseFragment {
         //添加数据为耗时的操作需要在子线程中进行
         new Thread(){
             public void run(){
-                list = new ArrayList<LocalVideo>();
+                list = new ArrayList<MediaItem>();
                 //得到解析者
                 ContentResolver resolver = context.getContentResolver();
 
@@ -110,7 +110,7 @@ public class LocalVideoFragment extends BaseFragment {
                         long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.SIZE));
                         String data = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA));
 
-                        list.add(new LocalVideo(name,duration,size,data));
+                        list.add(new MediaItem(name,duration,size,data));
 
                         handler.sendEmptyMessage(0);
                     }

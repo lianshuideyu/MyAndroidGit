@@ -4,13 +4,13 @@ package com.atguigu.playtest.domain;
  * Created by Administrator on 2017/5/19.
  */
 
-public class LocalVideo {
+public class MediaItem {
     private String name;
     private long duration;
     private long size;
     private String data;
 
-    public LocalVideo(String name, long duration, long size, String data) {
+    public MediaItem(String name, long duration, long size, String data) {
         this.name = name;
         this.duration = duration;
         this.size = size;
@@ -19,7 +19,7 @@ public class LocalVideo {
 
     @Override
     public String toString() {
-        return "LocalVideo{" +
+        return "MediaItem{" +
                 "name='" + name + '\'' +
                 ", duration=" + duration +
                 ", size=" + size +

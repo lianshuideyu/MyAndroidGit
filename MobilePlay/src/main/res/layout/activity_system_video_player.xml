@@ -9,6 +9,7 @@
     tools:context="com.atguigu.myandroidgit.activity.SystemVideoPlayerActivity">
 
     <com.atguigu.myandroidgit.View.VideoView
+        android:layout_centerInParent="true"
         android:id="@+id/vv"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

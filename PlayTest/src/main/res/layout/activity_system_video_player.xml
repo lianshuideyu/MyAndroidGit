@@ -8,7 +8,9 @@
     tools:context="com.atguigu.playtest.activity.SystemVideoPlayerActivity">
 
     <VideoView
+        android:layout_centerInParent="true"
         android:id="@+id/vv"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    <include layout="@layout/media_controller"/>
 </RelativeLayout>
