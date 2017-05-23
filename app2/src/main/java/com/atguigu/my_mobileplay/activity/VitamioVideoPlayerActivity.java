@@ -217,6 +217,8 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
                 })
                 .setNegativeButton("取消", null)
                 .show();
+
+
     }
 
     private void startSystemPlayer() {
@@ -231,6 +233,7 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
 
             intent.putExtras(bundle);
         }else if(uri != null) {
+            //当只要一个视频的时候
             intent.setData(uri);
         }
         startActivity(intent);
@@ -338,6 +341,7 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
                         int totalBuffer = bufferPercentage * seekbarVideo.getMax();
                         int secondaryProgress = totalBuffer / 100;
                         seekbarVideo.setSecondaryProgress(secondaryProgress);
+
                     } else {
                         seekbarVideo.setSecondaryProgress(0);
                     }

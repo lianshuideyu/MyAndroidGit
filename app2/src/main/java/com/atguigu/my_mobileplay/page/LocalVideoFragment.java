@@ -87,6 +87,7 @@ public class LocalVideoFragment extends BaseFragment {
     };
 
     private void getData() {
+        //获取数据认为是耗时的操作
         new Thread(){
             public void run(){
                 mediaItems = new ArrayList<MediaItem>();

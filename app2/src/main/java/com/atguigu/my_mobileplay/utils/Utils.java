@@ -62,6 +62,12 @@ public class Utils {
         return isNetUri;
     }
 
+
+    /**
+     * 返回速度的字符串
+     * @param context
+     * @return
+     */
     public String getNetSpeed(Context context) {
 
         long nowTotalRxBytes = TrafficStats.getUidRxBytes(context.getApplicationInfo().uid)==TrafficStats.UNSUPPORTED ? 0 :(TrafficStats.getTotalRxBytes()/1024);//转为KB;

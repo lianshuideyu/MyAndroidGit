@@ -8,13 +8,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.atguigu.my_mobileplay.R;
-import com.atguigu.my_mobileplay.domain.MoveInfo;
+import com.atguigu.my_mobileplay.domain.MediaItem;
 import com.atguigu.my_mobileplay.utils.Utils;
 
 import org.xutils.image.ImageOptions;
 import org.xutils.x;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by Administrator on 2017/5/22.
@@ -23,12 +23,14 @@ import java.util.List;
 public class NetVideoAdapter extends BaseAdapter {
 
     private final Context context;
-    private List<MoveInfo.TrailersBean> datas;
+//    private ArrayList<MoveInfo.TrailersBean> datas;
+    private ArrayList<MediaItem> datas;
+
     private Utils utils;
     private ImageOptions imageOptions;
 
 
-    public NetVideoAdapter(Context context, List<MoveInfo.TrailersBean> datas) {
+    public NetVideoAdapter(Context context, ArrayList<MediaItem> datas) {
         this.context = context;
         this.datas = datas;
 
@@ -48,7 +50,7 @@ public class NetVideoAdapter extends BaseAdapter {
     }
 
     @Override
-    public MoveInfo.TrailersBean getItem(int position) {
+    public MediaItem getItem(int position) {
          return datas.get(position);
     }
 
@@ -74,13 +76,20 @@ public class NetVideoAdapter extends BaseAdapter {
         }
 
         //根据位置得到对应的数据
-        MoveInfo.TrailersBean trailersBean = datas.get(position);
-        viewHolder.tv_name.setText(trailersBean.getMovieName());
-        viewHolder.tv_size.setText(trailersBean.getVideoLength() + "秒");
-        viewHolder.tv_duration.setText(trailersBean.getVideoTitle());
+        MediaItem trailersBean = datas.get(position);
+//        viewHolder.tv_name.setText(trailersBean.getMovieName());
+//        viewHolder.tv_size.setText(trailersBean.getVideoLength() + "秒");
+//        viewHolder.tv_duration.setText(trailersBean.getVideoTitle());
+//
+//        //图片的加载
+//        x.image().bind(viewHolder.iv_icon,trailersBean.getCoverImg(),imageOptions);
+
+        viewHolder.tv_name.setText(trailersBean.getName());
+        viewHolder.tv_size.setText(trailersBean.getSize() + "秒");
+        viewHolder.tv_duration.setText(trailersBean.getTitle());
 
         //图片的加载
-        x.image().bind(viewHolder.iv_icon,trailersBean.getCoverImg(),imageOptions);
+        x.image().bind(viewHolder.iv_icon,trailersBean.getIcon(),imageOptions);
 
         return convertView;
     }

@@ -226,11 +226,13 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             switch (msg.what) {
                 case SHOW_NET_SPEED:
                     if(isNetUri) {
+                        //utils.getNetSpeed(context)返回速度的字符串
                         String netSpeed = utils.getNetSpeed(SystemVideoPlayerActivity.this);
                         tv_loading_net_speed.setText("正在加载中...."+netSpeed);
                         tv_net_speed.setText("正在缓冲...."+netSpeed);
                         sendEmptyMessageDelayed(SHOW_NET_SPEED,1000);
                     }
+
                     
                     break;
                 
@@ -255,7 +257,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                         int secondaryProgress = totalBuffer / 100;
                         seekbarVideo.setSecondaryProgress(secondaryProgress);
 
-                        tvName.setText(uri.toString());
+                        //tvName.setText(uri.toString());
                     }else {
                         seekbarVideo.setSecondaryProgress(0);
                     }
@@ -273,6 +275,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                         //不要忘记重新赋值
                         preCurrentPosition = currentPosition;
                     }
+
 
                     //循环发消息
                     sendEmptyMessageDelayed(PROGRESS, 1000);
@@ -720,8 +723,10 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             //上一个和下一个不可用点击
             setEnable(false);
         }
+        //----------------------
+        if(mediaItems != null && mediaItems.size() > 0) {
 
-
+        }
     }
 
     private void setEnable(boolean b) {
@@ -736,7 +741,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
         }
 
-        btnPre.setEnabled(b);
+        btnPre.setEnabled(b);//这是按钮原生的setEnabled()方法
         btnNext.setEnabled(b);
     }
 
@@ -769,6 +774,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
             vv.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
+
 
             //设置按键状态
             setButtonStatus();
