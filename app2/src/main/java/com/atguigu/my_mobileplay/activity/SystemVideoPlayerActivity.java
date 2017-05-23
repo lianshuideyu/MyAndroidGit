@@ -19,6 +19,7 @@ import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -108,6 +109,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private LinearLayout ll_loading;
     private TextView tv_loading_net_speed;
 
+    private TextView brightnessTextView;
+
     private void findViews() {
 
         setContentView(R.layout.activity_system_video_player);
@@ -134,6 +137,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
         ll_loading = (LinearLayout)findViewById(R.id.ll_loading);
         tv_loading_net_speed = (TextView)findViewById(R.id.tv_loading_net_speed);
+
+        brightnessTextView = (TextView)findViewById(R.id.brightnessTextView);
 
         //----------
         //sb_test = (SeekBar) findViewById(R.id.sb_test);
@@ -421,6 +426,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN :
+                downX = event.getX();
                 downY = event.getY();
                 touchRange = Math.min(screenWidth,screenHeight);//得到收滑动的范围
                 currVol = am.getStreamVolume(AudioManager.STREAM_MUSIC);//得到当前的音量
@@ -432,23 +438,54 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                 float distanceY = downY - newY;//移动的距离
                 //Math.abs(distanceY)/maxY;滑动距离的百分比
                 //将要改变的音"量";要改变的声音 = (滑动的距离 / 总距离)*最大音量
-                float newVoice = distanceY / touchRange * maxVoice;
-                //得到最终要改变为的音量
-                float lastVoice = Math.min(Math.max(newVoice + currVol, 0), maxVoice);
-                if(newVoice != 0) {
-                    updateVoiceProgress((int) lastVoice);
+                if(downX > screenWidth / 2) {
+                    float newVoice = distanceY / touchRange * maxVoice;
+                    //得到最终要改变为的音量
+                    float lastVoice = Math.min(Math.max(newVoice + currVol, 0), maxVoice);
+                    if(newVoice != 0) {
+                        updateVoiceProgress((int) lastVoice);
+                    }
+                    Log.e("TAG","进入音量调节");
+                }else if (downX < screenWidth / 2) {
+
+                    brightnessTextView.setVisibility(View.VISIBLE);
+                    //处理屏幕亮度调节,上滑，亮度变大，下滑，亮度变小
+                    final double FLING_MIN_DISTANCE = 0.5;
+                    final double FLING_MIN_VELOCITY = 0.5;
+                    if (distanceY > FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
+                        setBrightness(10);
+                    }
+                    if (distanceY < FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
+                        setBrightness(-10);
+                    }
+                    Log.e("TAG","进入屏幕亮度调节");
                 }
+
 
                 break;
             case MotionEvent.ACTION_UP :
                 handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
 
+                brightnessTextView.setVisibility(View.INVISIBLE);
                 break;
         }
 
 
         return super.onTouchEvent(event);
 
+    }
+
+    private void setBrightness(int brightness) {
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.screenBrightness = lp.screenBrightness + brightness / 255.0f;
+        if (lp.screenBrightness > 1) {
+            lp.screenBrightness = 1;
+        } else if (lp.screenBrightness < 0.1) {
+            lp.screenBrightness = (float) 0.1;
+        }
+        getWindow().setAttributes(lp);
+        float sb = lp.screenBrightness;
+        brightnessTextView.setText((int) Math.ceil(sb * 100) + "%");
     }
 
     //监听手机音量加减按键

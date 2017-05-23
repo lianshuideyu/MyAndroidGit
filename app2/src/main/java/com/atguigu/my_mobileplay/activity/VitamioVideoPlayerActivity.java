@@ -18,6 +18,7 @@ import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -109,6 +110,8 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
      */
     private boolean isNetUri = true;
 
+    private TextView brightnessTextView;
+
     /**
      * Find the Views in the layout<br />
      * <br />
@@ -141,6 +144,8 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
         tv_net_speed = (TextView) findViewById(R.id.tv_net_speed);
         ll_loading = (LinearLayout)findViewById(R.id.ll_loading);
         tv_loading_net_speed = (TextView)findViewById(R.id.tv_loading_net_speed);
+        brightnessTextView = (TextView)findViewById(R.id.brightnessTextView);
+
         btnVoice.setOnClickListener(this);
         btnSwitchPlayer.setOnClickListener(this);
         btnExit.setOnClickListener(this);
@@ -495,7 +500,7 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
     private int mVol;
     //滑动的最大区域
     private float touchRang;
-
+    private float downX;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -503,6 +508,7 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
         detector.onTouchEvent(event);
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                downX = event.getX();
                 //1.记录相关参数
                 dowY = event.getY();
                 mVol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -516,28 +522,52 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
                 float distanceY = dowY - endY;
                 //原理：在屏幕滑动的距离： 滑动的总距离 = 要改变的声音： 最大声音
                 //要改变的声音 = （在屏幕滑动的距离/ 滑动的总距离）*最大声音;
-                float delta = (distanceY / touchRang) * maxVoice;
+                if(downX > screenWidth / 2) {
+                    float delta = (distanceY / touchRang) * maxVoice;
+                    if (delta != 0) {
+                        //最终声音 = 原来的+ 要改变的声音
+                        int mVoice = (int) Math.min(Math.max(mVol + delta, 0), maxVoice);
+                        //0~15
 
-
-                if (delta != 0) {
-                    //最终声音 = 原来的+ 要改变的声音
-                    int mVoice = (int) Math.min(Math.max(mVol + delta, 0), maxVoice);
-                    //0~15
-
-                    updateVoiceProgress(mVoice);
+                        updateVoiceProgress(mVoice);
+                    }
+                }else if (downX < screenWidth / 2) {
+                    brightnessTextView.setVisibility(View.VISIBLE);
+                    //处理屏幕亮度调节,上滑，亮度变大，下滑，亮度变小
+                    final double FLING_MIN_DISTANCE = 0.5;
+                    final double FLING_MIN_VELOCITY = 0.5;
+                    if (distanceY > FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
+                        setBrightness(10);
+                    }
+                    if (distanceY < FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
+                        setBrightness(-10);
+                    }
+                    Log.e("TAG","进入屏幕亮度调节");
                 }
-
 
                 //注意不要重新赋值
 //                dowY = event.getY();
-
-
                 break;
             case MotionEvent.ACTION_UP:
                 handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
+
+                brightnessTextView.setVisibility(View.INVISIBLE);
                 break;
         }
         return super.onTouchEvent(event);
+    }
+
+    private void setBrightness(int brightness) {
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.screenBrightness = lp.screenBrightness + brightness / 255.0f;
+        if (lp.screenBrightness > 1) {
+            lp.screenBrightness = 1;
+        } else if (lp.screenBrightness < 0.1) {
+            lp.screenBrightness = (float) 0.1;
+        }
+        getWindow().setAttributes(lp);
+        float sb = lp.screenBrightness;
+        brightnessTextView.setText((int) Math.ceil(sb * 100) + "%");
     }
 
     /**

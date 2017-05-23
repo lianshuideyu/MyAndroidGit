@@ -36,6 +36,7 @@ public class NetVideoAdapter extends BaseAdapter {
 
         utils = new Utils();
 
+        //为了给网络视频设置默认图片才加的这个参数
         imageOptions = new ImageOptions.Builder()
                 .setIgnoreGif(false)//是否忽略gif图。false表示不忽略。不写这句，默认是true
                 .setImageScaleType(ImageView.ScaleType.CENTER_CROP)
@@ -89,6 +90,7 @@ public class NetVideoAdapter extends BaseAdapter {
         viewHolder.tv_duration.setText(trailersBean.getTitle());
 
         //图片的加载
+        //imageOptions为了给网络视频设置默认图片才加的这个参数；一般不加这个参数也可以
         x.image().bind(viewHolder.iv_icon,trailersBean.getIcon(),imageOptions);
 
         return convertView;
